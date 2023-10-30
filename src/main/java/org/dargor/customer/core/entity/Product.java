@@ -1,17 +1,19 @@
 package org.dargor.customer.core.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Currency;
+import java.math.BigDecimal;
 
-@Setter
-@Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
 
     private String denomination;
-    private Currency unitPrice;
+    private BigDecimal unitPrice;
 
 }
