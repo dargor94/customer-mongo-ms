@@ -1,4 +1,4 @@
-package org.dargor.customer.app.messaging.producer;
+package org.dargor.customer.app.messagging.producer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;

@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dargor.customer.app.dto.CustomerResponseDto;
 import org.dargor.customer.app.dto.ProductRequestDtoWrapper;
-import org.dargor.customer.app.messaging.producer.ProductProducer;
+import org.dargor.customer.app.messagging.producer.ProductProducer;
 import org.dargor.customer.core.repository.CustomerRepository;
 import org.dargor.customer.core.util.MapperUtil;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,40 +25,24 @@ public class ProductServiceImpl implements ProductService {
     public Mono<CustomerResponseDto> saveProducts(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(ProductRequestDtoWrapper.class)
                 .flatMap(request -> customerRepository.findById(request.getCustomerId())
-                        .map(c -> {
+                        .map(customer -> {
                             var products = MapperUtil.toProducts(request.getProducts());
-                            if (ObjectUtils.isEmpty(c.getProducts())) {
-                                c.setProducts(products);
-                            } else {
-                                c.getProducts().addAll(products);
-                            }
-                            return c;
+                            Optional.ofNullable(customer.getProducts())
+                                    .ifPresentOrElse(products1 -> customer
+                                            .getProducts().addAll(products), () -> customer
+                                            .setProducts(products));
+                            return customer;
                         }))
                 .flatMap(customerRepository::save)
                 .map(MapperUtil::toCustomerResponse);
     }
 
     @Override
-    public void saveProducts(Flux<ProductRequestDtoWrapper> fluxRequest) {
-
-        var customer = fluxRequest.map(request -> customerRepository.findById(request.getCustomerId()))
-                .flatMap(customerMono -> customerMono);
-        customer.subscribe(customer1 -> log.info("Customer: " + customer1.getId()));
-     /*
-        fluxRequest.map(r -> {
-            var products = MapperUtil.toProducts(r.getProducts());
-            if (ObjectUtils.isEmpty(customer.getProducts())) {
-                c.setProducts(products);
-            } else {
-                c.getProducts().addAll(products);
-            }
-            return c;
-        }).flatMap(customerRepository::save);*/
-    }
-
-    @Override
     public Mono<Void> saveProductsKafka(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(ProductRequestDtoWrapper.class)
-                .flatMap(productProducer::saveProducts);
+                .flatMap(request -> {
+                    productProducer.saveProducts(request);
+                    return Mono.empty();
+                });
     }
 }

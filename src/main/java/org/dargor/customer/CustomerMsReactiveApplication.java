@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @EntityScan("org.dargor.customer.core.entity")
 @ComponentScan({
         "org.dargor.customer.app.config",
-        "org.dargor.customer.app.messaging",
+        "org.dargor.customer.app.messagging",
         "org.dargor.customer.app.routing",
         "org.dargor.customer.app.service",
         "org.dargor.customer.core.repository"

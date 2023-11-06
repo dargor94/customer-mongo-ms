@@ -1,13 +1,14 @@
 package org.dargor.customer.core.util;
 
-import org.dargor.customer.app.dto.*;
+import org.dargor.customer.app.dto.CustomerRequestDto;
+import org.dargor.customer.app.dto.CustomerResponseDto;
+import org.dargor.customer.app.dto.ProductRequestDto;
+import org.dargor.customer.app.dto.ProductResponseDto;
 import org.dargor.customer.core.entity.Customer;
 import org.dargor.customer.core.entity.Product;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,13 +58,5 @@ public class MapperUtil {
                         .unitPrice(productRequestDto.getUnitPrice())
                         .build())
                 .collect(Collectors.toList());
-    }
-
-    public static ProductRequestDtoWrapper toProductRequestWrapper(LinkedHashMap<String, Object> value) {
-        return ProductRequestDtoWrapper
-                .builder()
-                .customerId((String) value.get("customerId"))
-                .products((List<ProductRequestDto>) value.get("products"))
-                .build();
     }
 }
